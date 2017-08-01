@@ -1,49 +1,50 @@
 #Lord Hagen / olehag04@nfk.no
-#Print SMART DiskData til $utData, kan skrives til feks. Fellesområde, eller lokalt på disk. 
-#Velg hvilken mappe $utData blir lagret i med $felleslagring.
+
+#Print SMART DiskData til $OutputFile, kan skrives til feks. Nettverks-område, eller lokalt på disk. 
+#Velg hvilken mappe $OutputFile blir lagret i med $NetworkShare og $LocalPath.
+
+#Print SMART DISKData >  on a Network-Share or Locally.
+#Chose online location with $NetworkShare or $LocalPath.
 
 
-$InnData = WMIC.exe diskdrive get status
-$Felleslagring = "S:\Installasjonsfiler\DiskFeil"
+#Get SMART DATA.
+$SMARTData = WMIC.exe diskdrive get status
+#NetworkShare Location.
+$NetworkShare = "x:\NetworkFolder\location"
+$LocalPath = "$env\Folder\Location"
 
-if (Test-Path $Felleslagring) 
-{$utData = "$felleslagring\Diskfeil.txt"} 
+#If NetworkShare is accesible, save there. if not, use local path.
+if (Test-Path $NetworkShare) 
+{$OutputFile = "$NetworkShare\SMARTDISKLOG.txt"} 
 else 
-{$utData = "$env\nypc\SMARTDISKlog"}
+{$OutputFile = "$LocalPath\SMARTDISKLOG.txt"}
 
-if (Test-Path $Felleslagring)
+
+if ($SMARTData -match "OK") 
 {
-
-    if ($InnData -match "OK") 
-    {
-        Write-Host ""
-        Write-Host "`tSMART-Disk OK!" -ForegroundColor Green
-        "------------------Start------------------------" >> $utData
-        "Brukernavn: " | Out-File $utData -NoNewline -Append
-        $env:USERNAME >> $utData
-        "Datamaskin: " | Out-File $utData -NoNewline -Append
-        $env:COMPUTERNAME >> $utData
-        Get-Date >> $utData
-        $InnData >> $utData
-        "------------------Slutt------------------------" >> $utData
-    }
-    else 
-    {
-        Write-Host ""
-        Write-Host "`tMulig feil!" -ForegroundColor Red
-        "------------------Start------------------------" >> $utData
-        $env:USERNAME >> $utData
-        $env:COMPUTERNAME >> $utData
-        Get-Date >> $utData
-        $InnData >>$utData
-        "------------------Slutt------------------------" >> $utData
-        Write-Host ""
-        Write-Host ""
-        Start-Sleep -Seconds 2
-
-    }
-    
-} 
+    "------------------Start------------------------" >> $OutputFile
+    "Username: " | Out-File $OutputFile -NoNewline -Append
+    $env:USERNAME >> $OutputFile
+    "Computer: " | Out-File $OutputFile -NoNewline -Append
+    $env:COMPUTERNAME >> $OutputFile
+    Get-Date >> $OutputFile
+    $SMARTData >> $OutputFile
+    "------------------End------------------------" >> $OutputFile
+}
 else 
-{Write-Host "Ikke tilkoblet NFK-Nettverket, lagret lokalt!"}
+{
+    "------------------Start------------------------" >> $OutputFile
+    "Username: " | Out-File $OutputFile -NoNewline -Append
+    $env:USERNAME >> $OutputFile
+    "Computer: " | Out-File $OutputFile -NoNewline -Append
+    $env:COMPUTERNAME >> $OutputFile
+    Get-Date >> $OutputFile
+    $SMARTData >>$OutputFile
+    "------------------End------------------------" >> $OutputFile
+}
 
+#Uncommment next lines if you want results at end of script.
+
+#Write-Host ""
+#Write-Host "`t$SMARTData" -ForegroundColor Yellow
+#Start-Sleep -Seconds 5
