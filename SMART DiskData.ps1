@@ -1,14 +1,9 @@
-#Lord Hagen / olehag04@nfk.no
-
-#Velg hvor data blir lagret i med $NetworkShare og $LocalPath.
-
 #Chose location with $NetworkShare or $LocalPath.
-
 
 #Get SMART DATA.
 $SMARTData = WMIC.exe diskdrive get status
 
-#NetworkShare Location.
+#Location.
 $NetworkShare = "x:\NetworkFolder\location"
 $LocalPath = "$env\Folder\Location"
 
